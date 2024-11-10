@@ -1,0 +1,17 @@
+name = "lustre_tauri"
+version = "1.0.0"
+description = "Gleam bindings to Tauri commands for Lustre web applications"
+licences = ["Apache-2.0"]
+target = "javascript"
+
+repository = { type = "github", user = "ethanthoma", repo = "lustre_tauri" }
+
+gleam = ">= 1.1.0"
+
+[dependencies]
+gleam_stdlib = ">= 0.34.0 and < 2.0.0"
+lustre = ">= 4.6.1 and < 5.0.0"
+gleam_javascript = ">= 0.13.0 and < 1.0.0"
+
+[dev-dependencies]
+gleeunit = ">= 1.0.0 and < 2.0.0"

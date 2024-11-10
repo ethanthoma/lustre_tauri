@@ -1,0 +1,14 @@
+*
+
+!.gitignore
+!README.md
+
+!gleam.toml
+!manifest.toml
+
+!src/
+!src/*.gleam
+!src/*.js
+
+!test/
+!test/*.gleam
