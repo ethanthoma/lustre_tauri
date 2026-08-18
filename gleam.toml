@@ -1,5 +1,5 @@
 name = "lustre_tauri"
-version = "1.0.0"
+version = "2.0.0"
 description = "Gleam bindings to Tauri commands for Lustre web applications"
 licences = ["Apache-2.0"]
 target = "javascript"
