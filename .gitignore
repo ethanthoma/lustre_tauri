@@ -3,6 +3,10 @@
 !.gitignore
 !README.md
 
+!.github/
+!.github/workflows/
+!.github/workflows/*.yml
+
 !gleam.toml
 !manifest.toml
 

@@ -1,0 +1,20 @@
+name: release
+on:
+  push:
+    tags: ["v*"]
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: erlef/setup-beam@v1
+        with:
+          otp-version: "27"
+          gleam-version: "1.17.0"
+      - name: check tag matches gleam.toml version
+        run: |
+          version="$(grep --max-count=1 '^version' gleam.toml | cut -d '"' -f 2)"
+          test "v$version" = "$GITHUB_REF_NAME"
+      - run: gleam publish --yes
+        env:
+          HEXPM_API_KEY: ${{ secrets.HEXPM_API_KEY }}
