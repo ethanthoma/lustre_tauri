@@ -1,5 +1,5 @@
 import gleam/dynamic.{type Dynamic}
-import gleam/dynamic/decode
+import gleam/dynamic/decode.{type Decoder}
 import gleam/javascript/promise.{type Promise}
 import gleam/json
 import gleam/result
@@ -108,6 +108,10 @@ pub fn expect_text(
 /// response into a type-safe Gleam value. This is great for commands that
 /// return complex data structures like database queries or system information.
 ///
+/// Tauri deserialises command responses before they reach your application, so
+/// a command returning a Rust struct arrives as a JavaScript object - use this
+/// for those. Use `expect_json` for commands that return raw JSON strings.
+///
 /// ### Example
 /// ```gleam
 /// type SystemInfo {
@@ -115,18 +119,36 @@ pub fn expect_text(
 /// }
 ///
 /// fn get_system_info() {
-///   let decoder = dynamic.decode3(
-///     SystemInfo,
-///     dynamic.field("os", dynamic.string),
-///     dynamic.field("memory", dynamic.int),
-///     dynamic.field("cpu_cores", dynamic.int)
-///   )
-///   
-///   tauri.invoke("get_system_info", [], tauri.expect_json(decoder, GotSystemInfo))
+///   let decoder = {
+///     use os <- decode.field("os", decode.string)
+///     use memory <- decode.field("memory", decode.int)
+///     use cpu_cores <- decode.field("cpu_cores", decode.int)
+///     decode.success(SystemInfo(os:, memory:, cpu_cores:))
+///   }
+///
+///   tauri.invoke("get_system_info", [], tauri.expect_dynamic(decoder, GotSystemInfo))
 /// }
 /// ```
+pub fn expect_dynamic(
+  decoder: Decoder(a),
+  handler: fn(Result(a, TauriError)) -> message,
+) -> Expect(message) {
+  Expect(fn(response) {
+    response
+    |> result.map_error(InvokeError)
+    |> result.try(fn(value) {
+      decode.run(value, decoder)
+      |> result.map_error(DecodeError)
+    })
+    |> handler
+  })
+}
+
+/// Handle commands that return JSON as a string, parsing it with the given
+/// decoder. For commands whose response is already structured data (the usual
+/// case for a Tauri command returning a struct), use `expect_dynamic` instead.
 pub fn expect_json(
-  decoder: decode.Decoder(a),
+  decoder: Decoder(a),
   handler: fn(Result(a, TauriError)) -> message,
 ) -> Expect(message) {
   Expect(fn(response) {
