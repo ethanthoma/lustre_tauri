@@ -80,7 +80,9 @@ pub fn expect_anything(
 
 /// Handle commands that return text responses, such as reading file contents
 /// or getting simple string values from your Tauri backend.
-pub fn expect_text(to_msg: fn(Result(String, TauriError)) -> msg) -> Expect(msg) {
+pub fn expect_text(
+  to_msg: fn(Result(String, TauriError)) -> msg,
+) -> Expect(msg) {
   Expect(fn(response) {
     response
     |> result.map_error(InvokeError)
